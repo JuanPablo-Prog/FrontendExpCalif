@@ -21,10 +21,7 @@ export default function App() {
   const [page, setPage]       = useState('dashboard');
   const { toasts, toast, dismiss } = useToast();
 
-  const handleLogout = () => {
-    clearSession();
-    setUsuario(null);
-  };
+  const handleLogout = () => { clearSession(); setUsuario(null); };
 
   if (!usuario) {
     return <LoginPage onLogin={(u) => setUsuario(u)} />;
@@ -50,6 +47,13 @@ export default function App() {
           />
         );
       case "evaluaciones": return <EvaluacionesPage toast={toast} />;
+      case "perfil":
+        return (
+          <PerfilPage
+            toast={toast}
+            onProfileUpdate={(updatedUser) => setUsuario(updatedUser)}
+          />
+        );
       default:             return <DashboardPage    toast={toast} />;
     }
   };

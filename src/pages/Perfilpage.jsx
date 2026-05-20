@@ -4,7 +4,7 @@ import { C, F, btn, card } from "../api/Tokens";
 import { getRol } from "../api/Auth";
 import { FormGroup, Inp, Badge } from "../components/Emptystate";
 
-export default function PerfilPage({ toast }) {
+export default function PerfilPage({ toast, onProfileUpdate }) {
   const rolActual = getRol();
   const usuarioLocal = getUsuario();
 
@@ -55,8 +55,16 @@ export default function PerfilPage({ toast }) {
         }),
       });
 
-      // Actualizar el usuario en localStorage para que el sidebar refleje el cambio
-      saveSession(getToken(), { ...usuarioLocal, nombre: data.usuario.nombre, apellido: data.usuario.apellido });
+      // Sincronizar localStorage y notificar a App para actualizar el sidebar
+      const updatedUser = {
+        ...usuarioLocal,
+        nombre:    data.usuario.nombre,
+        apellido:  data.usuario.apellido,
+        matricula: data.usuario.matricula,
+      };
+      saveSession(getToken(), updatedUser);
+      if (onProfileUpdate) onProfileUpdate(updatedUser);
+
       setPerfil(data.usuario);
       setEditing(false);
       toast("Perfil actualizado correctamente. ✓");
