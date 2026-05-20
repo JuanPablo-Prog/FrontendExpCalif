@@ -99,6 +99,10 @@ export default function EvaluacionesPage({ toast }) {
   }, []);
 
   // ── Cargar criterios cuando cambia la exposición seleccionada ─────────────
+  // Ruta de resolución (en orden de prioridad):
+  //   1. exp.equipos.grupos.id_materia         ← ya viene del GET /api/exposiciones (backend corregido)
+  //   2. exp.equipos.grupos.materias.id_materia ← alternativa si viene anidado
+  //   3. Fetch explícito al equipo como fallback
   const cargarCriterios = async (idExposicion, expsSource) => {
     if (!idExposicion) { setCriterios([]); return; }
 
@@ -108,13 +112,23 @@ export default function EvaluacionesPage({ toast }) {
       const exp   = lista.find((e) => e.id_exposicion === parseInt(idExposicion));
       if (!exp) { setCriterios([]); return; }
 
-      // Navegar: exposición → equipo → grupo → materia
-      const equipo  = await apiFetch(`/api/equipos/${exp.id_equipo}`);
-      const idMat   = equipo?.grupos?.id_materia || equipo?.grupos?.materias?.id_materia;
+      // Intentar obtener id_materia desde los datos ya cargados
+      let idMat =
+        exp?.equipos?.grupos?.id_materia ||
+        exp?.equipos?.grupos?.materias?.id_materia;
+
+      // Fallback: fetch explícito al equipo (ahora el backend devuelve id_materia)
+      if (!idMat && exp.id_equipo) {
+        const equipo = await apiFetch(`/api/equipos/${exp.id_equipo}`);
+        idMat =
+          equipo?.grupos?.id_materia ||
+          equipo?.grupos?.materias?.id_materia;
+      }
 
       if (!idMat) {
-        toast("No se pudo encontrar la materia de esta exposición.", "error");
+        toast("Esta exposición no tiene una materia asociada. Verifica que el equipo tenga un grupo asignado.", "error");
         setCriterios([]);
+        setLoadingCriterios(false);
         return;
       }
 
