@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { apiFetch, saveSession } from "../api/Client";
-import { C, F, btn } from "../api/Tokens";
 
 export default function LoginPage({ onLogin }) {
   const [form, setForm]     = useState({ email: "", password: "" });
@@ -12,7 +11,8 @@ export default function LoginPage({ onLogin }) {
   const submit = async (e) => {
     e.preventDefault();
     if (!form.email || !form.password) return setError("Completa todos los campos.");
-    setError(""); setLoading(true);
+    setError(""); 
+    setLoading(true);
     try {
       const data = await apiFetch("/api/auth/login", {
         method: "POST",
@@ -31,54 +31,86 @@ export default function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: `radial-gradient(ellipse at 20% 20%, #0d2240 0%, #08101e 70%)`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F.body }}>
-      <div className="modal-anim" style={{ width: "100%", maxWidth: "440px", margin: "20px" }}>
-        {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: "32px" }}>
-          <div style={{ fontFamily: F.display, fontSize: "38px", fontWeight: "800", color: "#fff", letterSpacing: "-1px" }}>
-            Expos<span style={{ color: C.accent }}>Calif</span>
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden font-sans selection:bg-zinc-800 selection:text-zinc-200">
+      {/* Luces de fondo difuminadas estéticas (Glow effects) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-zinc-900/30 rounded-full blur-[120px] pointer-events-none animate-pulse duration-[6000ms]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-zinc-800/20 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Tarjeta del Formulario */}
+      <div className="w-full max-w-md bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-8 shadow-2xl relative z-10 animate-fade-in">
+        {/* Encabezado */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 text-2xl shadow-inner mb-4 select-none">
+            🎤
           </div>
-          <p style={{ color: "#64748b", fontSize: "14px", marginTop: "6px" }}>Sistema de calificación de exposiciones</p>
+          <h2 className="text-2xl font-extrabold tracking-tight text-zinc-50">
+            ExposCalif
+          </h2>
+          <p className="text-sm text-zinc-400 mt-1.5">
+            Ingresa al panel de control de exposiciones
+          </p>
         </div>
 
-        {/* Card */}
-        <div style={{ background: "#fff", borderRadius: "18px", padding: "36px", boxShadow: "0 30px 80px rgba(0,0,0,0.5)" }}>
-          <h2 style={{ fontFamily: F.display, fontSize: "22px", fontWeight: "700", color: C.textPrimary, marginBottom: "24px" }}>Iniciar sesión</h2>
+        {/* Formulario */}
+        <form onSubmit={submit} className="flex flex-col gap-5">
+          {/* Campo: Correo Electrónico */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider select-none">
+              Correo electrónico
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handle}
+              placeholder="nombre@ejemplo.com"
+              autoComplete="email"
+              disabled={loading}
+              className="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700 transition-all duration-150 disabled:opacity-50"
+            />
+          </div>
 
-          <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-              <label style={{ fontSize: "11px", fontWeight: "700", color: C.textSecond, textTransform: "uppercase", letterSpacing: "0.6px" }}>Correo electrónico</label>
-              <input
-                type="email" name="email" value={form.email} onChange={handle}
-                placeholder="usuario@ejemplo.com" autoComplete="email"
-                style={{ padding: "11px 14px", borderRadius: "9px", border: `1px solid ${C.border}`, fontSize: "14px", fontFamily: F.body, color: C.textPrimary }}
-              />
+          {/* Campo: Contraseña */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider select-none">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handle}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              disabled={loading}
+              className="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700 transition-all duration-150 disabled:opacity-50"
+            />
+          </div>
+
+          {/* Alerta de Error */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3.5 text-xs text-red-400 font-medium flex items-center gap-2.5 animate-shake">
+              <span className="shrink-0 text-sm">🛑</span>
+              <span>{error}</span>
             </div>
+          )}
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-              <label style={{ fontSize: "11px", fontWeight: "700", color: C.textSecond, textTransform: "uppercase", letterSpacing: "0.6px" }}>Contraseña</label>
-              <input
-                type="password" name="password" value={form.password} onChange={handle}
-                placeholder="••••••••" autoComplete="current-password"
-                style={{ padding: "11px 14px", borderRadius: "9px", border: `1px solid ${C.border}`, fontSize: "14px", fontFamily: F.body, color: C.textPrimary }}
-              />
-            </div>
-
-            {error && (
-              <div style={{ background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: "8px", padding: "10px 14px", fontSize: "13px", color: "#991b1b", fontWeight: "600" }}>
-                {error}
-              </div>
+          {/* Botón de Enviar */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-zinc-50 hover:bg-zinc-200 text-zinc-950 font-bold py-3 px-4 rounded-xl text-sm transition-all duration-150 shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none mt-2 flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-zinc-900/20 border-t-zinc-900 rounded-full animate-spin" />
+                Validando credenciales…
+              </>
+            ) : (
+              "Iniciar sesión"
             )}
-
-            <button type="submit" disabled={loading} style={{ ...btn("primary", "lg"), justifyContent: "center", marginTop: "4px", opacity: loading ? 0.7 : 1 }}>
-              {loading ? "Ingresando..." : "Ingresar"}
-            </button>
-          </form>
-        </div>
-
-        <p style={{ textAlign: "center", color: "#334155", fontSize: "12px", marginTop: "20px" }}>
-          ¿No tienes cuenta? Solicítala a tu docente o administrador.
-        </p>
+          </button>
+        </form>
       </div>
     </div>
   );
