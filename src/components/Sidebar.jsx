@@ -1,4 +1,4 @@
-import { C, F } from "../api/Tokens";
+import React from 'react';
 import { getRol } from "../api/Auth";
 
 const NAV_ITEMS = [
@@ -16,61 +16,65 @@ const NAV_ITEMS = [
 export default function Sidebar({ page, setPage, usuario, onLogout }) {
   const rol = getRol();
 
+  // Filtrar los elementos del menú según el rol del usuario
+  const menuFiltrado = NAV_ITEMS.filter(item => item.roles.includes(rol));
+
   return (
-    <div style={{ width: "240px", minWidth: "240px", background: C.sidebar, display: "flex", flexDirection: "column" }}>
-      {/* Brand */}
-      <div style={{ padding: "28px 22px 22px", borderBottom: "1px solid #1a2840" }}>
-        <div style={{ fontFamily: F.display, fontSize: "22px", fontWeight: "800", color: "#fff", letterSpacing: "-0.5px", lineHeight: 1 }}>
-          Expos<span style={{ color: C.accent }}>Calif</span>
+    <header className="w-full bg-zinc-900 border-b border-zinc-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shrink-0">
+      
+      {/* Lado Izquierdo: Logo y Navegación */}
+      <div className="flex items-center gap-6 min-w-0 flex-1">
+        <div className="text-xl font-black tracking-wider text-zinc-50 shrink-0 flex items-center gap-2">
+          <span className="text-amber-400">⚡</span> EVALUA
         </div>
-        <div style={{ fontSize: "10px", fontWeight: "700", color: C.accent, textTransform: "uppercase", letterSpacing: "1.5px", marginTop: "4px" }}>{rol}</div>
+        
+        {/* Enlaces de navegación horizontales (con scroll si no caben en pantallas chicas) */}
+        <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-1 pr-4">
+          {menuFiltrado.map((item) => {
+            const isActive = page === item.page;
+            return (
+              <button
+                key={item.page}
+                onClick={() => setPage(item.page)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  isActive
+                    ? "bg-zinc-800 text-zinc-50 border border-zinc-700 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40"
+                }`}
+              >
+                <span className={isActive ? "text-amber-400" : "text-zinc-500"}>{item.icon}</span>
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: "14px 10px", display: "flex", flexDirection: "column", gap: "3px" }}>
-        {NAV_ITEMS.filter((n) => n.roles.includes(rol)).map((item) => {
-          const active = page === item.page;
-          return (
-            <button key={item.page} onClick={() => setPage(item.page)} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 13px", borderRadius: "10px", border: "none", background: active ? C.accent : "transparent", color: active ? "#fff" : "#94a3b8", fontWeight: active ? "700" : "500", fontSize: "13.5px", fontFamily: F.body, cursor: "pointer", width: "100%", textAlign: "left", transition: "all 0.15s" }}
-              onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "#162033"; }}
-              onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
-            >
-              <span style={{ fontSize: "16px", flexShrink: 0, width: "20px", textAlign: "center" }}>{item.icon}</span>
-              {item.label}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Usuario card + Perfil + Logout */}
-      <div style={{ padding: "14px 10px", borderTop: "1px solid #1a2840" }}>
-        {/* Avatar clickeable → perfil */}
+      {/* Lado Derecho: Usuario y Salir */}
+      <div className="flex items-center gap-4 shrink-0 pl-4 border-l border-zinc-800">
         <button
           onClick={() => setPage("perfil")}
-          style={{ width: "100%", padding: "10px 13px", borderRadius: "10px", background: page === "perfil" ? "#1e3a5f" : "#162033", border: page === "perfil" ? `1px solid ${C.accent}` : "1px solid transparent", cursor: "pointer", textAlign: "left", marginBottom: "6px", transition: "all 0.15s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#1e3a5f"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = page === "perfil" ? "#1e3a5f" : "#162033"; }}
+          className="flex items-center gap-2 group text-left"
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F.display, fontWeight: "800", fontSize: "12px", color: "#fff", flexShrink: 0 }}>
-              {usuario?.nombre?.[0]}{usuario?.apellido?.[0]}
-            </div>
-            <div style={{ overflow: "hidden" }}>
-              <p style={{ fontSize: "12px", fontWeight: "700", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{usuario?.nombre} {usuario?.apellido}</p>
-              <p style={{ fontSize: "10px", color: "#64748b" }}>Ver mi perfil</p>
-            </div>
+          <div className="w-8 height-8 min-w-[32px] rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-500/30 group-hover:bg-amber-500/30 transition-colors">
+            {usuario?.nombre?.[0]}{usuario?.apellido?.[0]}
+          </div>
+          <div className="hidden md:block max-w-[120px] overflow-hidden">
+            <p className="text-xs font-semibold text-zinc-200 truncate group-hover:text-zinc-50 transition-colors">
+              {usuario?.nombre}
+            </p>
+            <p className="text-[10px] text-zinc-500 truncate">Mi Perfil</p>
           </div>
         </button>
 
         <button
           onClick={onLogout}
-          style={{ width: "100%", padding: "8px 13px", borderRadius: "10px", border: "none", background: "transparent", color: "#64748b", fontSize: "13px", fontWeight: "600", fontFamily: F.body, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "8px" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#162033"; e.currentTarget.style.color = "#f87171"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b"; }}
+          className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+          title="Cerrar sesión"
         >
-          <span>⎋</span> Cerrar sesión
+          🚪
         </button>
       </div>
-    </div>
+    </header>
   );
 }

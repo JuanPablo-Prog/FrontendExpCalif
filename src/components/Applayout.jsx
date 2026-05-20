@@ -1,33 +1,42 @@
-import { C, F } from "../api/Tokens";
+import React from 'react';
 import Sidebar from "./Sidebar";
 
 const PAGE_TITLES = {
   dashboard:    "Dashboard",
+  usuarios:     "Gestión de Usuarios",
   materias:     "Materias",
-  criterios:    "Criterios",
+  criterios:    "Criterios de Evaluación",
   grupos:       "Grupos",
   alumnos:      "Alumnos",
   equipos:      "Equipos",
   exposiciones: "Exposiciones",
   evaluaciones: "Evaluaciones",
+  perfil:       "Mi Perfil"
 };
 
 export default function AppLayout({ page, setPage, usuario, onLogout, children }) {
   return (
-    <div style={{ minHeight: "100vh", background: `radial-gradient(ellipse at 20% 20%, #0d2240 0%, #08101e 70%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", fontFamily: "'Nunito', sans-serif" }}>
-      <div style={{ width: "100%", maxWidth: "1340px", minHeight: "88vh", background: "#fff", borderRadius: "20px", boxShadow: "0 30px 100px rgba(0,0,0,0.6)", display: "flex", overflow: "hidden" }}>
-        <Sidebar page={page} setPage={setPage} usuario={usuario} onLogout={onLogout} />
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", background: C.contentBg, minWidth: 0 }}>
-          {/* Topbar */}
-          <div style={{ background: "#fff", borderBottom: `1px solid ${C.border}`, padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <h1 style={{ fontFamily: F.display, fontSize: "20px", fontWeight: "700", color: C.textPrimary }}>{PAGE_TITLES[page]}</h1>
-            <span style={{ fontSize: "12px", color: C.textMuted }}>{new Date().toLocaleDateString("es-MX", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
-          </div>
-          {/* Content */}
-          <div className="page-anim" style={{ flex: 1, padding: "24px 28px", overflowY: "auto" }}>
-            {children}
-          </div>
+    <div className="min-h-screen flex flex-col text-zinc-50 bg-zinc-950 font-sans">
+      {/* Menú Superior */}
+      <Sidebar page={page} setPage={setPage} usuario={usuario} onLogout={onLogout} />
+      
+      {/* Contenedor del contenido */}
+      <div className="flex-1 flex flex-col min-w-0">
+        
+        {/* Título de la página actual */}
+        <div className="max-w-7xl w-full mx-auto px-6 md:px-8 pt-8 pb-2 flex items-center justify-between shrink-0">
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-50">
+            {PAGE_TITLES[page] || "Panel General"}
+          </h1>
+          <span className="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20 uppercase tracking-wider">
+            {usuario?.rol || "Usuario"}
+          </span>
         </div>
+
+        {/* Área donde se inyectan las páginas de la app */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-6 md:px-8 py-6">
+          {children}
+        </main>
       </div>
     </div>
   );
