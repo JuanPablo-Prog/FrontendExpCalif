@@ -1,20 +1,57 @@
-import { C, F, btn } from "../api/Tokens";
+import React from 'react';
 
 export default function ConfirmDialog({ open, message = "¿Estás seguro de eliminar este registro?", onConfirm, onCancel, loading }) {
   if (!open) return null;
+
   return (
-    <div onClick={onCancel} style={{ position: "fixed", inset: 0, background: "rgba(8,16,30,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1100, padding: "20px" }}>
-      <div className="modal-anim" onClick={(e) => e.stopPropagation()} style={{ background: "#fff", borderRadius: "14px", width: "100%", maxWidth: "400px", padding: "28px 28px 22px", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
-        <div style={{ display: "flex", gap: "14px", marginBottom: "20px" }}>
-          <div style={{ width: "42px", height: "42px", borderRadius: "10px", background: C.dangerLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", flexShrink: 0 }}>⚠️</div>
+    <div
+      onClick={onCancel}
+      className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center z-[1100] p-4 animate-fade-in"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-md p-6 shadow-2xl text-zinc-50"
+      >
+        <div className="flex gap-4 items-start mb-6">
+          {/* Icono de advertencia en tonos rojos sutiles */}
+          <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-xl text-red-400 shrink-0">
+            ⚠️
+          </div>
+          
           <div>
-            <p style={{ fontFamily: F.display, fontWeight: "700", fontSize: "16px", color: C.textPrimary, marginBottom: "6px" }}>Confirmar eliminación</p>
-            <p style={{ fontSize: "14px", color: C.textSecond, lineHeight: 1.5 }}>{message}</p>
+            <h3 className="text-base font-bold tracking-tight text-zinc-50 mb-1">
+              Confirmar eliminación
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              {message}
+            </p>
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-          <button onClick={onCancel} style={btn("ghost")} disabled={loading}>Cancelar</button>
-          <button onClick={onConfirm} style={btn("danger")} disabled={loading}>{loading ? "Eliminando..." : "Sí, eliminar"}</button>
+
+        {/* Botones de acción */}
+        <div className="flex items-center justify-end gap-3">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+          
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-500 text-white shadow-sm transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                Eliminando…
+              </>
+            ) : (
+              "Eliminar registro"
+            )}
+          </button>
         </div>
       </div>
     </div>
